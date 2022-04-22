@@ -11,6 +11,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy.signal import convolve2d
+from numpy.fft import fft2, ifft2
+
+def fft_convolve2d(x,y):
+    """
+    2D convolution, using FFT
+    From: https://github.com/thearn/game-of-life
+    """
+    fr = fft2(x)
+    fr2 = fft2(np.flipud(np.fliplr(y)))
+    m,n = fr.shape
+    cc = np.real(ifft2(fr*fr2))
+    cc = np.roll(cc, - int(m / 2) + 1, axis=0)
+    cc = np.roll(cc, - int(n / 2) + 1, axis=1)
+    return cc
 
 class GameOfLife:
     def __init__(self, _n):
@@ -70,7 +84,22 @@ class GameOfLife:
     def step(self):
         """Updates the board according to the rules of Conway's game of life.
         """
-        for row in range(self.N):
+        # Convolution method
+        m, n = self.board.shape
+        k = np.zeros((m, n))
+        k[int(m/2-1):int(m/2+2), int(n/2-1):int(n/2+2)] = np.array([[1,1,1],[1,0,1],[1,1,1]])
+        #k = np.array([[1,1,1],[1,0,1],[1,1,1]])
+        b = fft_convolve2d(self.board,k).round()
+        c = np.zeros(b.shape)
+
+        c[np.where((b == 2) & (self.board == 1))] = 1
+        c[np.where((b == 3) & (self.board == 1))] = 1
+
+        c[np.where((b == 3) & (self.board == 0))] = 1
+        
+        self.board = c
+        # Classical Method
+        '''for row in range(self.N):
             for col in range(self.N):
                 cell = self.board[row, col]
                 next_cell = 1
@@ -82,7 +111,7 @@ class GameOfLife:
                         next_cell = 0
                 if cell == 0:
                     if neighbors != 3: next_cell = 0
-                self.board[row, col] = next_cell
+                self.board[row, col] = next_cell'''
         
     def get_board(self):
         """Returns the game board.
@@ -122,7 +151,7 @@ def downsample(board, n=11):
     board = convolved[::n, ::n] / n
     return board
 
-def animate_downsample(frameNum, board, img):
+def animate_step_downsample(frameNum, board, img):
     """Helper function used to animate a downsampled GOL board.
 
     Args:
@@ -174,9 +203,9 @@ def test_board_downsample(b):
 if __name__ == "__main__":
     N = 100
     b = GameOfLife(N)
-    b.set_board_rand(0.5)
+    b.set_board_rand(0.3)
     
-    # Functions for Testing
+    ### Functions for Testing ###
     # test_board_downsample(b)
     # test_board(b)
     
