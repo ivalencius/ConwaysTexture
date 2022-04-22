@@ -6,3 +6,6 @@ Final project investigating [Conway's Game of Life](https://www.wikiwand.com/en/
 * Francisco Oliveira
 * Lucas Streckenbach
 * Arella Kluvitse
+
+# Inspiration
+* Speed-up via convolution: [thearn](https://github.com/thearn/game-of-life)
