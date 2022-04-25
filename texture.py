@@ -7,6 +7,7 @@ Author: Ilan Valencius
 Copyright (c) 2022 Boston College
 '''
 
+from cmath import nan
 import numpy as np
 import matplotlib.pyplot as plt
 import functools
@@ -19,11 +20,11 @@ from gol import GameOfLife, downsample
 
 # Reimplement using 'skimage.feature.graycomatrix' and 'skimage.feature.graycoprops' 
 # from https://scikit-image.org/docs/stable/api/skimage.feature.html#skimage.feature.graycomatrix
-def GLCM(image):
+def texture_fxn(image):
     displacement = [1,1]
     
     # CALCULATE THE GLCM MATRIX:
-    print("The image: ") #(C2)
+    #print("The image: ") #(C2)
     glcm = np.zeros_like(image)
     rowmax, colmax = image.shape
     rowmax += -1
@@ -36,7 +37,7 @@ def GLCM(image):
             m, n = int(image[i][j]), int(image[i + displacement[0]][j + displacement[1]]) #(C9)
             glcm[m][n] += 1 #(C10)
             glcm[n][m] += 1 #(C11)
-    print("\nGLCM: ") #(C12)
+    #print("\nGLCM: ") #(C12)
     
     # CALCULATE ATTRIBUTES OF THE GLCM MATRIX:
     entropy = energy = contrast = homogeneity = None #(D1)
@@ -44,6 +45,8 @@ def GLCM(image):
     for m in range(len(glcm)): #(D3)
         for n in range(len(glcm[0])): #(D4)
             prob = (1.0 * glcm[m][n]) / normalizer #(D5)
+            if math.isnan(prob):
+                prob = 0
             if (prob >= 0.0001) and (prob <= 0.999): #(D6)
                 log_prob = math.log(prob,2) #(D7)
             if prob < 0.0001: #(D8)
@@ -67,11 +70,11 @@ def GLCM(image):
                 continue #(D26)
             homogeneity += prob / ( ( 1 + abs(m - n) ) * 1.0 ) #(D27)
     if abs(entropy) < 0.0000001: entropy = 0.0 #(D28)
-    print("\nTexture attributes: ") #(D29)
+    '''print("\nTexture attributes: ") #(D29)
     print(" entropy: %f" % entropy) #(D30)
     print(" contrast: %f" % contrast) #(D31)
-    print(" homogeneity: %f" % homogeneity) #(D32) 
-    return glcm
+    print(" homogeneity: %f" % homogeneity) #(D32)''' 
+    return glcm, entropy, contrast, homogeneity
 
 if __name__ == "__main__":
     N = 100
@@ -83,7 +86,7 @@ if __name__ == "__main__":
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
     ax[0].set_title('Raw Board '+str(b.get_board().shape))
-    glcm = GLCM(downsample(b.get_board()))
+    glcm = texture_fxn(downsample(b.get_board()))
     ax[1].imshow(glcm, interpolation='nearest')
     ax[1].set_title('GLCM of Board '+str(glcm.shape))
     plt.show()
