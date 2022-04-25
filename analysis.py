@@ -18,12 +18,12 @@ TRIALS = 10 # default number of times to run each set of parameters
 N = 100 # default size of NxN board
 PROB = 0.5 # default board initialization prob
 
-def texture_trials(b, down=True):
+def texture_trials(b,trials, down=True):
     entropies = []
     contrasts = []
     homogeneities = []
-    runs = [i for i in range(TRIALS+1)]
-    for _ in range(TRIALS+1):
+    runs = [i for i in range(trials+1)]
+    for _ in range(trials+1):
         if down:
             board = downsample(b.get_board())
         else:
@@ -42,12 +42,12 @@ def texture_trials(b, down=True):
     return return_dict
     
 def p_dependence(write_folder):
-    probabilities = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7,0.8,0.9]
+    probabilities = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     print('Testing probabilities')
     for prob in tqdm(probabilities):
         b = GameOfLife(N)
         b.set_board_rand(prob)
-        texture_dict = texture_trials(b)
+        texture_dict = texture_trials(b, TRIALS)
         df = pd.DataFrame(texture_dict)
         df.to_csv(os.path.join(write_folder, str(prob)+'.csv'), index=False)       
     
@@ -57,14 +57,21 @@ def size_dependence(write_folder):
     for sz in tqdm(size):
         b = GameOfLife(sz)
         b.set_board_rand(PROB)
-        texture_dict = texture_trials(b)
+        texture_dict = texture_trials(b, TRIALS)
         df = pd.DataFrame(texture_dict)
         df.to_csv(os.path.join(write_folder, str(sz)+'.csv'), index=False)   
 
 def trial_dependence(write_folder):
-    ...
+    trials = [5, 25, 50, 100]
+    print('Testing probabilities')
+    for trial in tqdm(trials):
+        b = GameOfLife(N)
+        b.set_board_rand(PROB)
+        texture_dict = texture_trials(b, trial)
+        df = pd.DataFrame(texture_dict)
+        df.to_csv(os.path.join(write_folder, str(trial)+'.csv'), index=False) 
     
 if __name__ == "__main__":
-    p_dependence('C:\\ConwaysTexture\\p_dependency\\')
+    # p_dependence('C:\\ConwaysTexture\\p_dependency\\')
     # size_dependence('C:\\ConwaysTexture\\size_dependency\\')
-    # trial_dependence('C:\\ConwaysTexture\\trial_dependency\\')
+    trial_dependence('C:\\ConwaysTexture\\trial_dependency\\')
