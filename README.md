@@ -8,4 +8,5 @@ Final project investigating [Conway's Game of Life](https://www.wikiwand.com/en/
 * Arella Kluvitse
 
 # Inspiration
-* Speed-up via convolution: [thearn](https://github.com/thearn/game-of-life)
+* GOL speed-up via convolution: [thearn](https://github.com/thearn/game-of-life)
+* Texture analysis: [Prof. Avinash Kak](https://engineering.purdue.edu/kak/) namely [this presentation](https://engineering.purdue.edu/kak/Tutorials/TextureAndColor.pdf)
