@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import functools
 import math
 
-from gol import GameOfLife
+from gol import GameOfLife, downsample
 
 # Inspiration https://engineering.purdue.edu/kak/Tutorials/TextureAndColor.pdf (section 3.3)
 # https://www.mathworks.com/help/images/texture-analysis-using-the-gray-level-co-occurrence-matrix-glcm.html
@@ -81,9 +81,9 @@ if __name__ == "__main__":
     #     b.step()
     fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
-    ax[0].imshow(b.get_board(), interpolation='nearest')
+    ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
     ax[0].set_title('Raw Board '+str(b.get_board().shape))
-    glcm = GLCM(b.get_board())
+    glcm = GLCM(downsample(b.get_board()))
     ax[1].imshow(glcm, interpolation='nearest')
     ax[1].set_title('GLCM of Board '+str(glcm.shape))
     plt.show()
