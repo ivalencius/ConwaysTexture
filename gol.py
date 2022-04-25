@@ -136,7 +136,7 @@ def animate_step(frameNum, board, img):
     img.set_data(board.get_board())
     return img
 
-def downsample(board, n=11):
+def downsample(board, n=3):
     """Downsamples a GOL board by a (n,n) kernel.
 
     Args:
