@@ -12,6 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import functools
 import math
+from skimage import feature
+from sklearn.metrics import homogeneity_completeness_v_measure
 
 from gol import GameOfLife, downsample
 
@@ -102,19 +104,53 @@ def quantized(image):
     ax[1].hist(image.flatten(), bins=len(levels))
     ax[1].set_title('Unique Values')
     plt.show()
+    
+def glcm2(board):
+    """Determines statistics of image via skimage.
+
+    Args:
+        board (ndarray): Board.
+
+    Returns:
+        tuple: Tuple of glcm, __statistics__
+    """
+    levels = 256 # Indicate the number of gray-levels counted [0, levels-1]
+    num_unique = len(np.unique(board))
+    # fig, ax = plt.subplots(1,2,figsize=(20,10))
+    # fig.suptitle('Type translation', fontsize=16)
+    # ax[0].imshow(board, interpolation='nearest')
+    # ax[0].set_title('float32')
+    # Need to convert to unsigned integer
+    board2 = (board*float(num_unique)).astype('uint8') 
+    
+    # ax[1].imshow(board2, interpolation='nearest')
+    # ax[1].set_title('uint8')
+    # plt.show()
+    
+    glcm = feature.graycomatrix(board2, [1], [0], levels=levels, symmetric=False, normed=True)
+    entropy = feature.graycoprops(glcm, 'energy')[0] # ???
+    contrast = feature.graycoprops(glcm, 'contrast')[0]
+    homogeneity = feature.graycoprops(glcm, 'homogeneity')[0]
+    print("\nTexture attributes: ") #(D29)
+    print(" entropy: %f" % entropy) #(D30)
+    print(" contrast: %f" % contrast) #(D31)
+    print(" homogeneity: %f" % homogeneity) #(D32)
+    return glcm.squeeze(), entropy, contrast, homogeneity
 
 if __name__ == "__main__":
     N = 100
     b = GameOfLife(N)
     b.set_board_rand(0.5)
-    #for i in range(3):
-    #     b.step()
+    glcm, _, _, _ = glcm2(downsample(b.get_board()))
+    for i in range(10):
+        b.step()
     # quantized(downsample(b.get_board()))
     fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
     ax[0].set_title('Raw Board '+str(b.get_board().shape))
-    glcm, _, _, _ = texture_fxn(downsample(b.get_board()))
+    #glcm, _, _, _ = texture_fxn(downsample(b.get_board()))
+    glcm, _, _, _ = glcm2(downsample(b.get_board()))
     ax[1].imshow(glcm, interpolation='nearest')
     ax[1].set_title('GLCM of Board '+str(glcm.shape))
     plt.show()
