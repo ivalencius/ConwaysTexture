@@ -19,6 +19,16 @@ N = 100 # default size of NxN board
 PROB = 0.5 # default board initialization prob
 
 def texture_trials(b,trials, down=True):
+    """Returns a dict of image stats for board b after trial runs.
+
+    Args:
+        b (GameOfLife): Game board.
+        trials (n): Number of runs.
+        down (bool, optional): Whether to downsample the board. Defaults to True.
+
+    Returns:
+        dict: Dictionary of stats per run.
+    """
     entropies = []
     contrasts = []
     homogeneities = []
@@ -42,6 +52,11 @@ def texture_trials(b,trials, down=True):
     return return_dict
     
 def p_dependence(write_folder):
+    """Determines the stats of initializing a board with given probability.
+
+    Args:
+        write_folder (string): Directory to write csv files too.
+    """
     probabilities = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     print('Testing probabilities')
     for prob in tqdm(probabilities):
@@ -52,6 +67,11 @@ def p_dependence(write_folder):
         df.to_csv(os.path.join(write_folder, str(prob)+'.csv'), index=False)       
     
 def size_dependence(write_folder):
+    """Determines the stats of initializing a board with given size.
+
+    Args:
+        write_folder (string): Directory to write csv files too.
+    """
     size= [5, 25, 50, 100, 250, 500, 750, 1000]
     print('Testing probabilities')
     for sz in tqdm(size):
@@ -62,6 +82,11 @@ def size_dependence(write_folder):
         df.to_csv(os.path.join(write_folder, str(sz)+'.csv'), index=False)   
 
 def trial_dependence(write_folder):
+    """Determines the stats of running a given board trial times.
+
+    Args:
+        write_folder (string): Directory to write csv files too.
+    """
     trials = [5, 25, 50, 100]
     print('Testing probabilities')
     for trial in tqdm(trials):

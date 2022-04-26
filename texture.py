@@ -85,11 +85,16 @@ def texture_fxn(image):
 # or if dithering is explicitly applied.
 
 # From https://www.wikiwand.com/en/White_noise
-#Any distribution of values is possible (although it must have zero DC component). 
+# Any distribution of values is possible (although it must have zero DC component). 
 # Even a binary signal which can only take on the values 1 or 0 will be white 
 # if the sequence is statistically uncorrelated.
 def quantized(image):
-    levels, counts = np.unique(image, return_counts=True)
+    """Returns a historgram for the values of a board.
+
+    Args:
+        image (np.array): Game of life board.
+    """
+    levels = np.unique(image)
     fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('Quantized', fontsize=16)
     ax[0].imshow(image, interpolation='nearest')
@@ -102,14 +107,14 @@ if __name__ == "__main__":
     N = 100
     b = GameOfLife(N)
     b.set_board_rand(0.5)
-    # for i in range(3):
+    #for i in range(3):
     #     b.step()
-    quantized(b.get_board())
-    '''fig, ax = plt.subplots(1,2,figsize=(20,10))
+    # quantized(downsample(b.get_board()))
+    fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
     ax[0].set_title('Raw Board '+str(b.get_board().shape))
-    glcm = texture_fxn(downsample(b.get_board()))
+    glcm, _, _, _ = texture_fxn(downsample(b.get_board()))
     ax[1].imshow(glcm, interpolation='nearest')
     ax[1].set_title('GLCM of Board '+str(glcm.shape))
-    plt.show()'''
+    plt.show()
