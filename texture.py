@@ -76,17 +76,40 @@ def texture_fxn(image):
     print(" homogeneity: %f" % homogeneity) #(D32)''' 
     return glcm, entropy, contrast, homogeneity
 
+# https://www.wikiwand.com/en/Image_noise
+# The noise caused by quantizing the pixels of a sensed image to a number 
+# of discrete levels is known as quantization noise. 
+# It has an approximately uniform distribution. 
+# Though it can be signal dependent, 
+# it will be signal independent if other noise sources are big enough to cause dithering, 
+# or if dithering is explicitly applied.
+
+# From https://www.wikiwand.com/en/White_noise
+#Any distribution of values is possible (although it must have zero DC component). 
+# Even a binary signal which can only take on the values 1 or 0 will be white 
+# if the sequence is statistically uncorrelated.
+def quantized(image):
+    levels, counts = np.unique(image, return_counts=True)
+    fig, ax = plt.subplots(1,2,figsize=(20,10))
+    fig.suptitle('Quantized', fontsize=16)
+    ax[0].imshow(image, interpolation='nearest')
+    ax[0].set_title('Downsampled')
+    ax[1].hist(image.flatten(), bins=len(levels))
+    ax[1].set_title('Unique Values')
+    plt.show()
+
 if __name__ == "__main__":
     N = 100
     b = GameOfLife(N)
     b.set_board_rand(0.5)
-    # for i in range(10):
+    # for i in range(3):
     #     b.step()
-    fig, ax = plt.subplots(1,2,figsize=(20,10))
+    quantized(b.get_board())
+    '''fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
     ax[0].set_title('Raw Board '+str(b.get_board().shape))
     glcm = texture_fxn(downsample(b.get_board()))
     ax[1].imshow(glcm, interpolation='nearest')
     ax[1].set_title('GLCM of Board '+str(glcm.shape))
-    plt.show()
+    plt.show()'''
