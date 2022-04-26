@@ -138,14 +138,15 @@ def glcm2(board):
     return glcm.squeeze(), entropy, contrast, homogeneity
 
 if __name__ == "__main__":
-    N = 100
+    N = 1000
     b = GameOfLife(N)
-    b.set_board_rand(0.5)
-    glcm, _, _, _ = glcm2(downsample(b.get_board()))
+    b.set_board_rand(0.3)
+    quantized(downsample(b.get_board()))
+    #glcm, _, _, _ = glcm2(downsample(b.get_board()))
     for i in range(10):
         b.step()
-    # quantized(downsample(b.get_board()))
-    fig, ax = plt.subplots(1,2,figsize=(20,10))
+    quantized(downsample(b.get_board()))
+    '''fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
     ax[0].set_title('Raw Board '+str(b.get_board().shape))
@@ -153,4 +154,4 @@ if __name__ == "__main__":
     glcm, _, _, _ = glcm2(downsample(b.get_board()))
     ax[1].imshow(glcm, interpolation='nearest')
     ax[1].set_title('GLCM of Board '+str(glcm.shape))
-    plt.show()
+    plt.show()'''
