@@ -147,7 +147,7 @@ def downsample(board, n=3):
         np.array: Downsampled board.
     """
     kernel = np.ones((n, n))
-    convolved = convolve2d(board, kernel, mode='valid')
+    convolved = convolve2d(board, kernel, mode='same', boundary='wrap')
     board = convolved[::n, ::n] / n
     return board
 
@@ -201,11 +201,11 @@ def test_board_downsample(b):
     plt.show()
     
 if __name__ == "__main__":
-    N = 100
+    N = 1000
     b = GameOfLife(N)
     b.set_board_rand(0.3)
     
     ### Functions for Testing ###
-    # test_board_downsample(b)
-    # test_board(b)
+    #test_board_downsample(b)
+    #test_board(b)
     
