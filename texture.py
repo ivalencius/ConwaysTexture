@@ -14,6 +14,7 @@ import functools
 import math
 from skimage import feature
 from sklearn.metrics import homogeneity_completeness_v_measure
+from scipy import stats
 
 from gol import GameOfLife, downsample
 
@@ -86,12 +87,27 @@ def texture_fxn(image):
 # it will be signal independent if other noise sources are big enough to cause dithering, 
 # or if dithering is explicitly applied.
 
+def normalRank(image): 
+    image = image.flatten()
+    analysis = stats.normaltest(image)
+    p_val = analysis[1]
+    '''if p_val > .9:   
+        return("High Normal Distr. similarity: ", analysis[1])
+    elif p_val < .9 and p_val > .75: 
+        return("Mid Normal Distr. similarity: ", analysis[1])
+    elif p_val < .75 and p_val > .5: 
+        return("Low Normal Distr. similarity: ", analysis[1])
+    else: 
+        return("No Normal Distr. similarity: ", analysis[1])'''
+    return p_val
+
+
 # From https://www.wikiwand.com/en/White_noise
 # Any distribution of values is possible (although it must have zero DC component). 
 # Even a binary signal which can only take on the values 1 or 0 will be white 
 # if the sequence is statistically uncorrelated.
-def quantized(image):
-    """Returns a historgram for the values of a board.
+def histogram(image):
+    """Displays a histogram for the values of a board.
 
     Args:
         image (np.array): Game of life board.
@@ -105,7 +121,7 @@ def quantized(image):
     ax[1].set_title('Unique Values')
     plt.show()
     
-def glcm2(board):
+def glcm_stats(board):
     """Determines statistics of image via skimage.
 
     Args:
@@ -137,15 +153,21 @@ def glcm2(board):
     print(" homogeneity: %f" % homogeneity) #(D32)
     return glcm.squeeze(), entropy, contrast, homogeneity
 
+def statistics(image):
+    _, _, mean, variance, skewness, kurtosis = stats.describe(image, axis=None)
+    return mean, variance, skewness, kurtosis
+
 if __name__ == "__main__":
     N = 1000
     b = GameOfLife(N)
-    b.set_board_rand(0.3)
-    quantized(downsample(b.get_board()))
+    b.set_board_rand(0.5)
+    #histogram(downsample(b.get_board()))
+    #print(normalRank(downsample(b.get_board())))
+    statistics(downsample(b.get_board()))
     #glcm, _, _, _ = glcm2(downsample(b.get_board()))
-    for i in range(10):
-        b.step()
-    quantized(downsample(b.get_board()))
+    #for i in range(100):
+    #    b.step()
+    #histogram(downsample(b.get_board()))
     '''fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
