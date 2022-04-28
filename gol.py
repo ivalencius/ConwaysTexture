@@ -205,6 +205,6 @@ if __name__ == "__main__":
     b.set_board_rand(0.3)
     
     ### Functions for Testing ###
-    test_board_downsample(b)
-    #test_board(b)
+    #test_board_downsample(b)
+    test_board(b)
     

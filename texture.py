@@ -144,13 +144,13 @@ def glcm_stats(board):
     # plt.show()
     
     glcm = feature.graycomatrix(board2, [1], [0], levels=levels, symmetric=False, normed=True)
-    entropy = feature.graycoprops(glcm, 'energy')[0] # ???
-    contrast = feature.graycoprops(glcm, 'contrast')[0]
-    homogeneity = feature.graycoprops(glcm, 'homogeneity')[0]
-    print("\nTexture attributes: ") #(D29)
+    entropy = feature.graycoprops(glcm, 'energy')[0][0] # ???
+    contrast = feature.graycoprops(glcm, 'contrast')[0][0]
+    homogeneity = feature.graycoprops(glcm, 'homogeneity')[0][0]
+    '''print("\nTexture attributes: ") #(D29)
     print(" entropy: %f" % entropy) #(D30)
     print(" contrast: %f" % contrast) #(D31)
-    print(" homogeneity: %f" % homogeneity) #(D32)
+    print(" homogeneity: %f" % homogeneity) #(D32)'''
     return glcm.squeeze(), entropy, contrast, homogeneity
 
 def statistics(image):
@@ -158,16 +158,16 @@ def statistics(image):
     return mean, variance, skewness, kurtosis
 
 if __name__ == "__main__":
-    N = 1000
+    N = 100
     b = GameOfLife(N)
-    b.set_board_rand(0.5)
-    #histogram(downsample(b.get_board()))
+    b.set_board_rand(0.3)
+    histogram(downsample(b.get_board()))
     #print(normalRank(downsample(b.get_board())))
-    statistics(downsample(b.get_board()))
+    #statistics(downsample(b.get_board()))
     #glcm, _, _, _ = glcm2(downsample(b.get_board()))
-    #for i in range(100):
-    #    b.step()
-    #histogram(downsample(b.get_board()))
+    for i in range(50):
+        b.step()
+    histogram(downsample(b.get_board()))
     '''fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')

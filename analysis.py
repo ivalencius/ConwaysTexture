@@ -13,9 +13,10 @@ from texture import texture_fxn, normalRank, histogram, statistics, glcm_stats
 import os
 from tqdm import tqdm
 
-# Need to determine number of trials, what is E[X] of game of life, use Markov or something
-TRIALS = 10 # default number of times to run each set of parameters
-N = 1000 # default size of NxN board
+### NUMBER OF TRIALS SHOULD BE SIZE OF BOARD, NEED DATA TO BE ABLE TO TRAVERSE THE WHOLE BOARD IN THE TIME GIVEN
+TRIALS = 100 # default number of times to run each set of parameters
+# Trials * 2 ?? To go diagonal needs to go 2 steps
+N = 100 # default size of NxN board
 PROB = 0.5 # default board initialization prob
 
 def texture_trials(b,trials, down=True):
@@ -112,33 +113,46 @@ def stats_trials(b,trials, down=True):
     variances = []
     skewnesses = []
     kurtosises = []
+    entropies = []
+    contrasts = []
+    homogeneities = []
     runs = [i for i in range(trials+1)]
     for _ in range(trials+1):
         if down:
             board = downsample(b.get_board())
         else:
             board = b.get_board()
+        # Test for normal distribution
         p_val = normalRank(board)
         pscores.append(p_val)
+        # Get statistics on distribution
         mean, variance, skewness, kurtosis = statistics(board)
         means.append(mean)
         variances.append(variance)
         skewnesses.append(skewness)
         kurtosises.append(kurtosis)
+        # Get statistics of 2D board
+        _, entropy, contrast, homogeneity = glcm_stats(board)
+        entropies.append(entropy)
+        contrasts.append(contrast)
+        homogeneities.append(homogeneity)
         b.step() # First time through loop is base board
     return_dict = {
         'Run':runs,
-        'P-Score':pscores,
-        'Mean Value': means,
-        'Variance':variances,
-        'Skewness':skewnesses,
-        'Kurtosises':kurtosises
+        'Mean': means,
+        '(1D) P-Score':pscores,
+        '(1D) Variance':variances,
+        '(1D) Skewness':skewnesses,
+        '(1D) Kurtosises':kurtosises,
+        '(2D) Entropy':entropies,
+        '(2D) Contrast':contrasts,
+        '(2D) Homogeneity':homogeneities
     }
     return return_dict
 
 def stats_test(write_folder):
-    #probabilities = [i/100 for i in range(1,100)]
-    probabilities = [0.8]
+    probabilities = [i/100 for i in range(1,100)]
+    #probabilities = [0.8]
     print('Starting Testing')
     for prob in tqdm(probabilities):
         b = GameOfLife(N)
