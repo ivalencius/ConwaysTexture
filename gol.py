@@ -136,7 +136,7 @@ def animate_step(frameNum, board, img):
     img.set_data(board.get_board())
     return img
 
-def downsample(board, n=3):
+def downsample(board, n=11):
     """Downsamples a GOL board by a (n,n) kernel.
 
     Args:
@@ -148,8 +148,7 @@ def downsample(board, n=3):
     """
     kernel = np.ones((n, n))
     convolved = convolve2d(board, kernel, mode='same', boundary='wrap')
-    board = convolved[::n, ::n] / n
-    return board
+    return convolved
 
 def animate_step_downsample(frameNum, board, img):
     """Helper function used to animate a downsampled GOL board.
