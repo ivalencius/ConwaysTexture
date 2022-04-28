@@ -148,7 +148,7 @@ def downsample(board, n=11):
     """
     kernel = np.ones((n, n))
     convolved = convolve2d(board, kernel, mode='same', boundary='wrap')
-    return convolved
+    return convolved/(n**2)
 
 def animate_step_downsample(frameNum, board, img):
     """Helper function used to animate a downsampled GOL board.
@@ -205,6 +205,6 @@ if __name__ == "__main__":
     b.set_board_rand(0.3)
     
     ### Functions for Testing ###
-    #test_board_downsample(b)
+    test_board_downsample(b)
     #test_board(b)
     
