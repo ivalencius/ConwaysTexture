@@ -135,8 +135,16 @@ def animate_step(frameNum, board, img):
     board.step()
     img.set_data(board.get_board())
     return img
+from skimage.util.shape import view_as_windows
 
-def downsample(board, n=11):
+def strided4D(arr,arr2,s):
+    return view_as_windows(arr, arr2.shape, step=s)
+
+def stride_conv_strided(arr,arr2,s):
+    arr4D = strided4D(arr,arr2,s=s)
+    return np.tensordot(arr4D, arr2, axes=((2,3),(0,1)))
+
+def downsample(board, n=16):
     """Downsamples a GOL board by a (n,n) kernel.
 
     Args:
@@ -147,8 +155,9 @@ def downsample(board, n=11):
         np.array: Downsampled board.
     """
     kernel = np.ones((n, n))
-    convolved = convolve2d(board, kernel, mode='same', boundary='wrap')
-    return convolved/(n**2)
+    #convolved = convolve2d(board, kernel, mode='same', boundary='wrap')
+    #return convolved/(n**2)
+    return stride_conv_strided(board, kernel, n)
 
 def animate_step_downsample(frameNum, board, img):
     """Helper function used to animate a downsampled GOL board.
@@ -205,6 +214,6 @@ if __name__ == "__main__":
     b.set_board_rand(0.3)
     
     ### Functions for Testing ###
-    #test_board_downsample(b)
-    test_board(b)
+    test_board_downsample(b)
+    #test_board(b)
     
