@@ -4,7 +4,7 @@ import glob
 import os
 
 read_folder = 'C:\\ConwaysTexture\\stats_tests\\'
-table_name = '100x100_stats.db'
+table_name = '1600x1600_stats.db'
 csv_list = glob.glob(os.path.join(read_folder, '*.csv'))
 conn = sqlite3.connect(table_name)
 c = conn.cursor()

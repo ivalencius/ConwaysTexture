@@ -16,7 +16,8 @@ from tqdm import tqdm
 ### NUMBER OF TRIALS SHOULD BE SIZE OF BOARD, NEED DATA TO BE ABLE TO TRAVERSE THE WHOLE BOARD IN THE TIME GIVEN
 TRIALS = 100 # default number of times to run each set of parameters
 # Trials * 2 ?? To go diagonal needs to go 2 steps
-N = 16*16 # default size of NxN board
+N = 16*100 # default size of NxN board 
+# Yields a 100x100 board via downsampling
 PROB = 0.5 # default board initialization prob
 
 def texture_trials(b,trials, down=True):
@@ -151,7 +152,7 @@ def stats_trials(b,trials, down=True):
     return return_dict
 
 def stats_test(write_folder):
-    probabilities = [i/100 for i in range(1,10)]
+    probabilities = [i/100 for i in range(1,100)]
     #probabilities = [0.8]
     print('Starting Testing')
     for prob in tqdm(probabilities):
