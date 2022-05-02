@@ -1,8 +1,6 @@
-from unittest import result
 import pandas as pd
 import sqlite3
 
-#read_folder = 'C:\\ConwaysTexture\\'
 table_name = '1600x1600_stats.db'
 conn = sqlite3.connect(table_name)
 c = conn.cursor()
