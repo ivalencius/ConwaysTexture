@@ -90,6 +90,16 @@ class GameOfLife:
         k[int(m/2-1):int(m/2+2), int(n/2-1):int(n/2+2)] = np.array([[1,1,1],[1,0,1],[1,1,1]])
         #k = np.array([[1,1,1],[1,0,1],[1,1,1]])
         b = fft_convolve2d(self.board,k).round()
+        
+        '''fig, ax = plt.subplots(1,3,figsize=(20,10))
+        #fig.suptitle('Raw Board', fontsize=16)
+        ax[0].imshow(self.board, interpolation='nearest')
+        ax[0].set_title('Raw Board')
+        ax[1].imshow(k, interpolation='nearest')
+        ax[1].set_title('Convolution Kernel')
+        ax[2].imshow(b, interpolation='nearest')
+        ax[2].set_title('Result of Convolution')
+        plt.show()'''
         c = np.zeros(b.shape)
 
         c[np.where((b == 2) & (self.board == 1))] = 1
@@ -185,10 +195,13 @@ def test_board(b):
 
     ani = animation.FuncAnimation(fig, func=animate_step, 
                                   fargs=(b, img),
-                                  frames = 10,
+                                  frames = 33,
                                   interval=500,
                                   save_count=50)
-    plt.show()
+    writergif = animation.PillowWriter(fps=3) 
+    ani.save('figs\\raw_runs.gif', writer=writergif)
+    
+    #plt.show()
     
 def test_board_downsample(b):
     """Plots effect of downsampling GOL board.
@@ -209,11 +222,13 @@ def test_board_downsample(b):
     plt.show()
     
 if __name__ == "__main__":
-    N = 1000
+    N = 10
     b = GameOfLife(N)
     b.set_board_rand(0.3)
-    
+    b.step()
+    plt.imshow(b.get_board())
+    plt.show()
     ### Functions for Testing ###
-    test_board_downsample(b)
+    #test_board_downsample(b)
     #test_board(b)
     

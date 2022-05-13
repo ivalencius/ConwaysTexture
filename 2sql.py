@@ -1,3 +1,14 @@
+'''
+Filename: c:\ConwaysTexture\2sql.py
+Path: c:\ConwaysTexture
+Created Date: Thursday, April 28th 2022, 4:27:01 pm
+Author: Ilan Valencius
+
+Copyright (c) 2022 Boston College
+
+Saves the results of a series of runs into one sql database.
+'''
+
 import pandas as pd
 import sqlite3
 import glob
