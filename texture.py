@@ -15,6 +15,7 @@ import math
 from skimage import feature
 from sklearn.metrics import homogeneity_completeness_v_measure
 from scipy import stats
+import matplotlib.animation as animation
 
 from gol import GameOfLife, downsample
 
@@ -29,7 +30,15 @@ from gol import GameOfLife, downsample
 # it will be signal independent if other noise sources are big enough to cause dithering, 
 # or if dithering is explicitly applied.
 
-def normalRank(image): 
+def normalRank(image):
+    """Returns the p value for the null hypothesis that the values in image are normally distributed.
+
+    Args:
+        image (np.array): board array
+
+    Returns:
+        float: p value
+    """     
     image = image.flatten()
     analysis = stats.normaltest(image)
     p_val = analysis[1]
@@ -48,7 +57,7 @@ def normalRank(image):
 # Any distribution of values is possible (although it must have zero DC component). 
 # Even a binary signal which can only take on the values 1 or 0 will be white 
 # if the sequence is statistically uncorrelated.
-def histogram(image):
+def histogram(image, n=None):
     """Displays a histogram for the values of a board.
 
     Args:
@@ -60,6 +69,9 @@ def histogram(image):
     ax[0].imshow(image, interpolation='nearest')
     ax[0].set_title('Downsampled')
     ax[1].hist(image.flatten(), bins=len(levels))
+    if n != None:
+        ymin, ymax = ax[1].get_ylim()
+        ax[1].axvline(n*256, ymin, ymax, color='red', label='Center for Initialization Prob')
     ax[1].set_title('Unique Values')
     plt.show()
     
@@ -96,20 +108,77 @@ def glcm_stats(board):
     return glcm.squeeze(), entropy, contrast, homogeneity
 
 def statistics(image):
+    """Returns the statistics of a nxn np.array.
+
+    Args:
+        image (np.array): board array
+
+    Returns:
+        tuple: assosiated stats
+    """    
     _, _, mean, variance, skewness, kurtosis = stats.describe(image, axis=None)
     return mean, variance, skewness, kurtosis
 
+
+def animate_step(frameNum, board,ax1, ax2,n):
+    """Helper function used to animate a downsampled GOL board.
+
+    Args:
+        frameNum (int): Ignored.
+        board (np.array): Game board.
+        img (matplotlib.axes._subplots.AxesSubplot): Board image.
+
+    Returns:
+        matplotlib.axes._subplots.AxesSubplot: New board image.
+    """
+    image = downsample(board.get_board())
+    ax1.imshow(image)
+    ax1.set_title('Downsampled Board')
+    if frameNum % 5 ==0 and frameNum>1:
+        ax2.clear()
+    ax2.hist(image.flatten(), bins=len(np.unique(image)))
+    ymin, ymax = ax2.get_ylim()
+    ax2.axvline(n*256, ymin, ymax, color='red', label='Center for Initialization Prob')
+    ax2.set_title('Unique Values')
+    board.step()
+    
+
+def animate_histogram(b,n):
+    """Animates game of life progression.
+
+    Args:
+        b (Board): GOL board.
+    """
+    # create a figure with two subplots
+    image = downsample(b.get_board())
+    fig, (ax1, ax2) = plt.subplots(1,2, figsize=(15,8))
+    ax1.imshow(image)
+    ax2.hist(image.flatten(), bins=len(np.unique(image)))
+    ymin, ymax = ax2.get_ylim()
+    ax2.axvline(n*256, ymin, ymax, color='red', label='Center for Initialization Prob')
+    
+    ani = animation.FuncAnimation(fig, func=animate_step, 
+                                  fargs=(b,ax1, ax2, n),
+                                  frames = 33,
+                                  interval=500,
+                                  save_count=50)
+    writergif = animation.PillowWriter(fps=3) 
+    ani.save('figs\\0.33_hist.gif', writer=writergif)
+    
+    #plt.show()
 if __name__ == "__main__":
-    N = 100
+    N = 1600
     b = GameOfLife(N)
-    b.set_board_rand(0.69)
-    histogram(downsample(b.get_board()))
+    b.set_board_rand(0.33)
+    animate_histogram(b, n=0.33)
+    #histogram(downsample(b.get_board()))
+    #print(statistics(downsample(b.get_board())))
     #print(normalRank(downsample(b.get_board())))
     #statistics(downsample(b.get_board()))
     #glcm, _, _, _ = glcm2(downsample(b.get_board()))
-    for i in range(75):
-        b.step()
-    histogram(downsample(b.get_board()))
+    #for _ in range(5):
+    #   b.step()
+    #histogram(downsample(b.get_board()), n=0.1)
     '''fig, ax = plt.subplots(1,2,figsize=(20,10))
     fig.suptitle('After 10 runs', fontsize=16)
     ax[0].imshow(downsample(b.get_board()), interpolation='nearest')
